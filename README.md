@@ -1,218 +1,131 @@
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white" />
-  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
-  <img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" />
-  <img src="https://img.shields.io/badge/Google_Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white" />
-  <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white" />
-  <img src="https://img.shields.io/badge/ChromaDB-FF6F00?style=for-the-badge&logoColor=white" />
-</p>
+# Agentic RAG Assistant
 
-<h1 align="center">🤖 Agentic RAG Assistant</h1>
+A multi-agent RAG (Retrieval-Augmented Generation) system that lets you upload documents and ask questions about them. It uses a three-agent pipeline — one for retrieval, one for answering, and one that verifies the answer isn't hallucinated.
 
-<p align="center">
-  <b>A Multi-Agent Retrieval-Augmented Generation system with built-in hallucination verification</b>
-</p>
+Built with FastAPI, Streamlit, Google Gemini, and ChromaDB.
 
-<p align="center">
-  Upload documents → Ask questions → Get verified, source-grounded answers
-</p>
+## What it does
 
----
+- Upload PDFs, DOCX, TXT, or CSV files through a simple web interface
+- Ask natural language questions about your documents
+- Get detailed answers grounded in the actual content you uploaded
+- A verification agent checks whether the answer is actually supported by the source material or if the LLM is making stuff up
 
-## 🌟 Overview
+The verification step is what makes this different from a basic RAG setup — it adds a layer of trust by flagging answers that might contain hallucinations.
 
-**Agentic RAG Assistant** is an intelligent knowledge assistant that goes beyond simple RAG. It employs a **multi-agent pipeline** where:
-
-1. A **Retrieval Agent** fetches the most relevant document chunks from a vector database
-2. A **Reasoning Agent** generates a comprehensive, well-structured answer using retrieved context
-3. A **Verification Agent** cross-checks the answer against source documents to detect hallucinations
-
-This three-agent architecture ensures answers are not just relevant, but **factually grounded** in your uploaded documents.
-
----
-
-## 🏗️ Architecture
+## How the pipeline works
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Streamlit Frontend                        │
-│              (Document Upload + Chat Interface)              │
-└──────────────────────┬──────────────────────────────────────┘
-                       │ HTTP (REST API)
-                       ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   FastAPI Backend (/api)                      │
-│                                                              │
-│  ┌──────────────┐  ┌───────────────┐  ┌──────────────────┐  │
-│  │  Retrieval    │→│  Reasoning     │→│  Verification     │  │
-│  │  Agent        │  │  Agent         │  │  Agent           │  │
-│  │              │  │                │  │                   │  │
-│  │ ChromaDB     │  │ Google Gemini  │  │ Hallucination     │  │
-│  │ Vector Search│  │ LLM Response   │  │ Check (JSON)      │  │
-│  └──────────────┘  └───────────────┘  └──────────────────┘  │
-│                                                              │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │  Document Ingestion Pipeline                          │   │
-│  │  PDF / DOCX / TXT / CSV → Chunking → Embedding → DB  │   │
-│  └──────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+User Query
+    │
+    ▼
+Retrieval Agent ──→ searches ChromaDB for relevant chunks
+    │
+    ▼
+Reasoning Agent ──→ generates a detailed answer using Gemini
+    │
+    ▼
+Verification Agent ──→ cross-checks the answer against source docs
+    │
+    ▼
+Final Response (answer + verification status + sources)
 ```
 
----
+The backend runs on FastAPI (port 8000) and the frontend is a Streamlit app (port 8501). They communicate over REST.
 
-## ✨ Key Features
+## Setup
 
-| Feature | Description |
-|---------|-------------|
-| 📄 **Multi-format Ingestion** | Upload PDF, DOCX, TXT, and CSV files |
-| 🧠 **Agentic Pipeline** | Three specialized agents work in sequence |
-| 🛡️ **Hallucination Detection** | Verification agent flags unsupported claims |
-| 🔍 **Semantic Search** | Sentence-transformer embeddings with ChromaDB |
-| 🔑 **Bring Your Own Key** | Enter your Gemini API key directly in the UI |
-| ⚡ **Quick Actions** | One-click summarize, explain concepts, or create study plans |
-| 🐳 **Docker Ready** | Containerized deployment with a single Dockerfile |
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- **Python 3.12+**
-- **Google Gemini API Key** — Get one free at [Google AI Studio](https://aistudio.google.com/apikey)
-
-### Installation
+**Prerequisites:** Python 3.12+ and a [Google Gemini API key](https://aistudio.google.com/apikey)
 
 ```bash
-# 1. Clone the repository
+# clone and cd into the project
 git clone https://github.com/Nishant052004/Agentic-RAG-Assistant.git
 cd Agentic-RAG-Assistant
 
-# 2. Create and activate virtual environment
+# set up virtual environment
 python -m venv venv
+venv\Scripts\activate        # on Windows
+# source venv/bin/activate   # on Mac/Linux
 
-# Windows
-venv\Scripts\activate
-
-# macOS / Linux
-source venv/bin/activate
-
-# 3. Install dependencies
+# install dependencies
 pip install -r requirements.txt
 
-# 4. Configure environment
+# set up your env file
 cp .env.example .env
-# Edit .env and add your GEMINI_API_KEY
+# open .env and paste your GEMINI_API_KEY
 ```
 
-### Running the App
+## Running
+
+The easiest way is to use the launcher script — it starts both the backend and frontend:
 
 ```bash
-# Option 1: Launch both backend & frontend with one command
 python run.py
+```
 
-# Option 2: Run services individually
-# Terminal 1 - Backend
+Then open http://127.0.0.1:8501 in your browser.
+
+You can also run them separately if you prefer:
+
+```bash
+# backend
 uvicorn app.main:app --host 127.0.0.1 --port 8000
 
-# Terminal 2 - Frontend
+# frontend (in another terminal)
 streamlit run streamlit_app.py --server.port 8501
 ```
 
-Once running, open **http://127.0.0.1:8501** in your browser.
-
-### Docker
+There's also a Dockerfile if you want to containerize it:
 
 ```bash
 docker build -t agentic-rag .
 docker run -p 8000:8000 --env-file .env agentic-rag
 ```
 
----
-
-## 📁 Project Structure
+## Project structure
 
 ```
-Agentic-RAG-Assistant/
 ├── app/
-│   ├── __init__.py
-│   ├── main.py              # FastAPI app entry point
-│   ├── api.py               # REST API routes (/chat, /upload)
-│   ├── agent_pipeline.py    # Multi-agent orchestration logic
-│   ├── config.py            # Pydantic settings & env loading
-│   ├── embeddings.py        # Sentence-transformer embedding setup
-│   ├── ingestion.py         # Document chunking & indexing
-│   ├── vectorstore.py       # ChromaDB vector store operations
-│   └── utils.py             # File parsing (PDF, DOCX, TXT, CSV)
-├── streamlit_app.py          # Streamlit frontend UI
-├── run.py                    # Unified launcher script
-├── requirements.txt          # Python dependencies
-├── Dockerfile                # Container configuration
-├── .env.example              # Environment variable template
-└── README.md
+│   ├── main.py              # FastAPI app
+│   ├── api.py               # API routes (/chat, /upload)
+│   ├── agent_pipeline.py    # the three-agent pipeline logic
+│   ├── config.py            # settings (pydantic-settings)
+│   ├── embeddings.py        # sentence-transformer setup
+│   ├── ingestion.py         # document chunking and indexing
+│   ├── vectorstore.py       # ChromaDB operations
+│   └── utils.py             # file parsing helpers
+├── streamlit_app.py          # frontend
+├── run.py                    # launches both servers
+├── requirements.txt
+├── Dockerfile
+└── .env.example
 ```
 
----
+## Configuration
 
-## ⚙️ Configuration
+Everything is configured through environment variables. See `.env.example` for the full list, but the main ones are:
 
-All settings are managed via environment variables (`.env` file):
+- `GEMINI_API_KEY` — your Google Gemini API key (required)
+- `LLM_MODEL` — which Gemini model to use (defaults to `gemini-1.5-flash`)
+- `EMBEDDING_MODEL` — sentence-transformer model (defaults to `all-MiniLM-L6-v2`)
+- `CHUNK_SIZE` / `CHUNK_OVERLAP` — controls how documents get split up (defaults: 500 / 50)
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `GEMINI_API_KEY` | *required* | Your Google Gemini API key |
-| `EMBEDDING_MODEL` | `all-MiniLM-L6-v2` | Sentence-transformer model for embeddings |
-| `LLM_MODEL` | `gemini-1.5-flash` | Gemini model to use for generation |
-| `CHUNK_SIZE` | `500` | Characters per document chunk |
-| `CHUNK_OVERLAP` | `50` | Overlap between consecutive chunks |
-| `CHROMA_HOST` | `localhost` | ChromaDB host address |
-| `CHROMA_PORT` | `8001` | ChromaDB port |
+You can also pass your API key directly through the sidebar in the UI if you don't want to use an env file.
 
----
+## Tech stack
 
-## 🎯 How It Works
+- **FastAPI** + Uvicorn for the backend API
+- **Streamlit** for the frontend
+- **Google Gemini** as the LLM (via OpenAI-compatible endpoint)
+- **Sentence Transformers** for document embeddings
+- **ChromaDB** for vector storage
+- **LangChain** for orchestration
+- **Pydantic Settings** for config management
 
-1. **Upload** a document via the sidebar — it gets parsed, chunked, embedded, and stored in ChromaDB
-2. **Ask a question** — the Retrieval Agent performs semantic search to find the top-k relevant chunks
-3. **Reasoning Agent** constructs a detailed answer grounded in the retrieved context using Google Gemini
-4. **Verification Agent** independently checks the answer against the source context and returns a JSON verdict:
-   - ✅ **Verified Supported** — answer is well-grounded in the documents
-   - ⚠️ **Inconclusive** — partial support found
-   - ❌ **Hallucination Risk** — answer may contain unsupported claims
-5. **Results** are displayed with the answer, verification badge, and source references
+## Contributing
 
----
+If you want to contribute, feel free to fork the repo and open a PR. Any improvements to the agent pipeline or new document format support would be especially welcome.
 
-## 🛠️ Tech Stack
+## License
 
-- **Backend**: FastAPI + Uvicorn
-- **Frontend**: Streamlit
-- **LLM**: Google Gemini (via OpenAI-compatible API)
-- **Embeddings**: Sentence Transformers (`all-MiniLM-L6-v2`)
-- **Vector DB**: ChromaDB (local persistent storage)
-- **Orchestration**: LangChain
-- **Config**: Pydantic Settings + python-dotenv
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## 📝 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
----
-
-<p align="center">
-  Built with ❤️ by <a href="https://github.com/Nishant052004">Nishant</a>
-</p>
+MIT
