@@ -1,5 +1,11 @@
 # Agentic RAG Assistant
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://agentic-rag-assistant-fdy8im2emrsdgw7ttelwyu.streamlit.app/)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Nishant052004/Agentic-RAG-Assistant)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+
+> 🚀 **Live Web Application**: [https://agentic-rag-assistant-fdy8im2emrsdgw7ttelwyu.streamlit.app/](https://agentic-rag-assistant-fdy8im2emrsdgw7ttelwyu.streamlit.app/)
+
 A multi-agent RAG (Retrieval-Augmented Generation) system that lets you upload documents and ask questions about them. It uses a three-agent pipeline — one for retrieval, one for answering, and one that verifies the answer isn't hallucinated.
 
 Built with FastAPI, Streamlit, Google Gemini, and ChromaDB.
@@ -57,6 +63,13 @@ cp .env.example .env
 
 ## Running
 
+### 🌐 Instant Live Web App
+Try the multi-agent pipeline live in your browser:  
+👉 **[agentic-rag-assistant-fdy8im2emrsdgw7ttelwyu.streamlit.app](https://agentic-rag-assistant-fdy8im2emrsdgw7ttelwyu.streamlit.app/)**
+
+---
+
+### Local Execution
 The easiest way is to use the launcher script — it starts both the backend and frontend:
 
 ```bash
